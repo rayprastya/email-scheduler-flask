@@ -81,8 +81,3 @@ Auto email scheduler built with Flask.
     docker-compose up --build
     ```
 
-## API Documentation
-
-The API documentation is available on Postman. You can access it via the following link:
-
-[Postman API Documentation](https://api.postman.com/collections/10601820-25c1994c-e246-48fa-8f43-fb35c682a360?access_key=PMAT-01J49BD81WSMF397W917RH2KPR)
