@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+        .event-list {
+            margin-top: 20px;
+        }
+        .event-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Events</h1>
+    <form id="eventForm">
+        <label for="name">Event Name:</label>
+        <input type="text" id="name" name="name" required>
+        
+        <button type="submit">Add Event</button>
+    </form>
+    
+    <h2>Event List</h2>
+    <div class="event-list" id="eventList">
+        <!-- Events -->
+    </div>
+
+    <script>
+        document.getElementById('eventForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/api/v1/events', {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: formData.get('name')
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Event added successfully');
+                loadEvents();
+                this.reset();
+            } else {
+                alert('Error adding event');
+            }
+        });
+
+        async function loadEvents() {
+            const response = await fetch('/api/v1/events');
+            const events = await response.json();
+            const eventList = document.getElementById('eventList');
+            eventList.innerHTML = '';
+
+            events.forEach(event => {
+                const eventItem = document.createElement('div');
+                eventItem.classList.add('event-item');
+                eventItem.innerHTML = `
+                    <strong>Event ID:</strong> ${event.id}<br>
+                    <strong>Event Name:</strong> ${event.name}
+                `;
+                eventList.appendChild(eventItem);
+            });
+        }
+
+        loadEvents();
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipients</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+        .recipient-list {
+            margin-top: 20px;
+        }
+        .recipient-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recipients</h1>
+    <form id="recipientForm">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="event_id">Event ID:</label>
+        <input type="text" id="event_id" name="event_id" required>
+        
+        <button type="submit">Add Recipient</button>
+    </form>
+    
+    <h2>Recipient List</h2>
+    <div class="recipient-list" id="recipientList">
+        <!-- Recipients -->
+    </div>
+
+    <script>
+        document.getElementById('recipientForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/api/v1/recipients', {
+                method: 'POST',
+                body: JSON.stringify({
+                    email: formData.get('email'),
+                    event_id: formData.get('event_id')
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Recipient added successfully');
+                loadRecipients();
+                this.reset();
+            } else {
+                alert('Error adding recipient');
+            }
+        });
+
+        async function loadRecipients() {
+            const response = await fetch('/api/v1/recipients');
+            const recipients = await response.json();
+            const recipientList = document.getElementById('recipientList');
+            recipientList.innerHTML = '';
+
+            recipients.forEach(recipient => {
+                const recipientItem = document.createElement('div');
+                recipientItem.classList.add('recipient-item');
+                recipientItem.innerHTML = `
+                    <strong>Email:</strong> ${recipient.email}<br>
+                    <strong>Event ID:</strong> ${recipient.event_id}
+                `;
+                recipientList.appendChild(recipientItem);
+            });
+        }
+
+        loadRecipients();
+    </script>
+</body>
+</html>

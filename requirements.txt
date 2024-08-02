@@ -1,0 +1,11 @@
+Flask
+Flask-SQLAlchemy
+Celery
+Flask-Migrate
+Flask-Script
+Flask_mail
+psycopg2-binary
+python-dotenv
+redis
+pytz
+pytest

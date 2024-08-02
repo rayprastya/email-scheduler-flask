@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Emails</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+        .email-list {
+            margin-top: 20px;
+        }
+        .email-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Schedule Emails</h1>
+    <form id="emailForm">
+        <label for="event_id">Event ID:</label>
+        <input type="text" id="event_id" name="event_id" required>
+        
+        <label for="email_subject">Email Subject:</label>
+        <input type="text" id="email_subject" name="email_subject" required>
+        
+        <label for="email_content">Email Content:</label>
+        <textarea id="email_content" name="email_content" required></textarea>
+        
+        <label for="timestamp">Timestamp:</label>
+        <input type="datetime-local" id="timestamp" name="timestamp" required>
+        
+        <button type="submit">Schedule Email</button>
+    </form>
+    
+    <h2>Pending Emails</h2>
+    <div class="email-list" id="emailList">
+        <!-- Pending emails -->
+    </div>
+
+    <script>
+        document.getElementById('emailForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/api/v1/schedule-emails', {
+                method: 'POST',
+                body: JSON.stringify({
+                    event_id: formData.get('event_id'),
+                    email_subject: formData.get('email_subject'),
+                    email_content: formData.get('email_content'),
+                    timestamp: formData.get('timestamp')
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Email scheduled successfully');
+                loadEmails();
+                this.reset();
+            } else {
+                alert('Error scheduling email');
+            }
+        });
+
+        async function loadEmails() {
+            const response = await fetch('/api/v1/schedule-emails');
+            const emails = await response.json();
+            const emailList = document.getElementById('emailList');
+            emailList.innerHTML = '';
+
+            emails.forEach(email => {
+                const emailItem = document.createElement('div');
+                emailItem.classList.add('email-item');
+                emailItem.innerHTML = `
+                    <strong>Event ID:</strong> ${email.event_id}<br>
+                    <strong>Subject:</strong> ${email.email_subject}<br>
+                    <strong>Content:</strong> ${email.email_content}<br>
+                    <strong>Timestamp:</strong> ${new Date(email.timestamp).toLocaleString()}
+                `;
+                emailList.appendChild(emailItem);
+            });
+        }
+
+        loadEmails();
+    </script>
+</body>
+</html>
